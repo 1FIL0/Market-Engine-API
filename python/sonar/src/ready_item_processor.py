@@ -48,7 +48,7 @@ def loadValuesToReadyItem(readyItem: MarketItem, bymykelItem: MarketItem, steamw
     readyItem.wear = steamwebItem.wear
     readyItem.marketPrice = steamwebItem.marketPrice
     readyItem.imageUrl = steamwebItem.imageUrl
-    readyItem.imageName = f"{readyItem.weaponName}.{readyItem.skinName}.{readyItem.category}.{readyItem.wear}.ico"
+    readyItem.imageName = f"{readyItem.weaponName}.{readyItem.skinName}.{definitions.categoryToString(readyItem.category)}.{definitions.wearToString(readyItem.wear)}.ico"
     readyItem.steamMarketUrl = steamwebItem.steamMarketUrl
     gradeInt = readyItem.grade
     maxCollectionGrade = definitions.getMaxCollectionGrade(readyItem.collection)
@@ -98,12 +98,12 @@ def readyItemToJson(readyItem: MarketItem):
         "Weapon Name": readyItem.weaponName,
         "Skin Name": readyItem.skinName,
         "Full Name": readyItem.fullName,
-        "Grade": readyItem.grade,
-        "Category": readyItem.category,
-        "Wear": readyItem.wear,
+        "Grade": definitions.gradeToString(readyItem.grade),
+        "Category": definitions.categoryToString(readyItem.category),
+        "Wear": definitions.wearToString(readyItem.wear),
         "Market Price": readyItem.marketPrice,
         "Tradeupable": readyItem.tradeupable,
-        "Collection": readyItem.collection,
+        "Collection": definitions.collectionToString(readyItem.collection),
         "Min Float": readyItem.minFloat,
         "Max Float": readyItem.maxFloat,
         "Image Name": readyItem.imageName,
