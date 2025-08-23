@@ -16,9 +16,10 @@ flags:
 ```--assets``` - fetch all skin images  
 ```--process``` - create items that are ready to be in use with the client  
 ```--sync local``` - sync ready items locally to your client data folder  
-```--sync server``` - sync ready items to your specified endpoint  
 
 ## Compile from source
+### README IN PROGRESS
+<!--
 ### Base
 Clone the repo and dependencies:
 ```git clone https://github.com/1FIL0/Market-Engine-API/ market_engine_api && git clone https://github.com/1FIL0/Market-Engine-Share market_engine_share && https://github.com/1FIL0/Market-Engine-Shell-Network market_engine_shell_network```
@@ -32,7 +33,9 @@ navigate to the MarketEngine/ directory, create virtual environment and install 
 ### Create 7Zip Archive
 
 ### Create AppImage
+-->
 
 ## LICENCE
 Market Engine is licenced under the GPL-V3.0 Licence
+
 
