@@ -16,12 +16,14 @@ flags:
 ```--steamwebapi-key XXXXX``` - provide your key for the Steam Web API  
 ```--process``` - create items that are ready to be in use with the client  
 ```--sync local``` - sync ready items locally to your client data folder  
+```--interval-sec``` - rerun every x seconds
 
 ## Compile from source
 Building happens in the shell network, follow instructions at https://github.com/1FIL0/market_engine_shell_network
 
 ## LICENCE
 Market Engine is licenced under the GPL-V3.0 Licence
+
 
 
 
