@@ -5,7 +5,7 @@ An API that combines fetching steam market item prices with various other item d
 such as min/max float values and collections. Market Engine runs an offical version of this API.
 
 ## Download
-There's a windows and linux version you can download over at https://website.com or here in the github releases. I currently only support a CLI version of this program
+There's a windows and linux version you can download over at https://website.com or here in the github releases. This program is CLI Only
 
 ## How to use
 In order to use this API, you must get a Steam Web API Key first.  
@@ -22,6 +22,7 @@ Building happens in the shell network, follow instructions at https://github.com
 
 ## LICENCE
 Market Engine is licenced under the GPL-V3.0 Licence
+
 
 
 
