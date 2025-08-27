@@ -19,7 +19,7 @@ def updateServer():
         res = requests.post(
             definitions.URL_MARKET_ENGINE_UPDATE_ITEMS,
             headers={
-                "Authorization": f"Bearer {os.getenv("SERVER_UPDATE_ITEMS_SECRET_KEY")}",
+                "Authorization": f"Bearer {os.getenv("SERVER_UPDATE_ITEMS_SECRET")}",
                 "Content-Type": "application/json"
             },
             json=data
