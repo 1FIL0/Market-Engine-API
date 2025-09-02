@@ -59,13 +59,11 @@ def loadValuesToItem(item: MarketItem, entry: dict[Any, Any]):
         if gradeStr.startswith("Covert"): item.grade = definitions.consts.GRADE_COVERT
         if gradeStr.startswith("Contraband"): item.grade = definitions.consts.GRADE_CONTRABAND
 
-    price: float = -1.0
-    if entry["pricemedian24h"] and not price: price = entry["pricemedian24h"]
+    price: float = 0.0
     if entry["pricemedian7d"] and not price: price = entry["pricemedian7d"]
-    if entry["pricemedian30d"] and not price: price = entry["pricemedian30d"]
-    if entry["pricemedian90d"] and not price: price = entry["pricemedian90d"]
     if entry["pricemedian"] and not price: price = entry["pricemedian"]
-    item.marketPrice = entry["pricemedian"]
+    if not price: price = entry["pricelatest"]
+    item.marketPrice = price
     item.imageUrl = entry["itemimage"]
     item.permID = int(entry["id"], 16)
     url = entry["steamurl"]
