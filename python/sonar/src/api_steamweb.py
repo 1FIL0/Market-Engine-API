@@ -21,7 +21,7 @@ def loadSteamWebApiItems():
     global gSteamWebApiItems
     gSteamWebApiItems.clear()
     logger.sendMessage("Loading Steam Web Api Items")
-    data = file_handler.loadJson(definitions.PATH_DATA_API_STEAM_WEB_API_ITEMS)
+    data = file_handler.loadJson(str(definitions.PATH_DATA_API_STEAM_WEB_API_ITEMS))
     if not data:
         logger.warnMessage("No Steam Web Api Items found. Could not load, run --steamweb if you need to create ready files")
         return
@@ -84,7 +84,7 @@ def refreshSteamWebApiItems(customSteamWebAPIKey: str = ""):
     res = requests.get(f"https://www.steamwebapi.com/steam/api/items?key={steamWebAPIKey}&game=cs2")
     response.sendFastResponseMessage(res)
     if res.status_code != 200: return res
-    file_handler.writeFile(definitions.PATH_DATA_API_STEAM_WEB_API_ITEMS, json.dumps(res.json()))
+    file_handler.writeFile(str(definitions.PATH_DATA_API_STEAM_WEB_API_ITEMS), json.dumps(res.json()))
     logger.sendMessage("Finished")
     loadSteamWebApiItems()
     return res

@@ -64,12 +64,12 @@ def saveReadyItems():
     finalJsonData: dict[str, Any] = {"DATA": []}
     for readyItem in gReadyItems:
         finalJsonData["DATA"].append(readyItemToJson(readyItem))
-    file_handler.replaceJsonDataAtomic(definitions.PATH_DATA_API_READY_ITEMS, finalJsonData)
+    file_handler.replaceJsonDataAtomic(str(definitions.PATH_DATA_API_READY_ITEMS), finalJsonData)
     logger.sendMessage("Saved")
 
 def loadReadyItemsFromJson():
     global gReadyItems
-    data = file_handler.loadJson(definitions.PATH_DATA_API_READY_ITEMS)
+    data = file_handler.loadJson(str(definitions.PATH_DATA_API_READY_ITEMS))
     for entry in data["DATA"]:
         readyItem = MarketItem()
         readyItem.tempID = entry["Temp ID"]

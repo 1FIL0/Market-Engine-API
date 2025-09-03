@@ -2,10 +2,11 @@
 # Market Engine API
 ## Overview
 An API that combines fetching steam market item prices with various other item data, 
-such as min/max float values and collections. Mandatory for the Market Engine Client.
+such as min/max float values and collections. Mandatory for the Market Engine Client.  
+Website: https://marketengine.onefil.dev
 
 ## Download
-For prebuilt archives, head over to https://marketengine/1fil0.com.
+For prebuilt archives, head over to https://marketengine.onefil.dev.
 
 ## How to use
 If you wish to run the API yourself, here are the steps:  
@@ -25,7 +26,7 @@ flags:
 Building happens in the shell network, follow instructions at https://github.com/1FIL0/Market-Engine-Shell-Network.
 
 ## LICENCE
-Market Engine is licenced under the GPL-V3.0 Licence.
+This project is licenced under the GPL V3.0 licence.
 
 
 

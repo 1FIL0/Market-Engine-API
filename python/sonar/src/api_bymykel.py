@@ -16,7 +16,7 @@ def loadByMykelItems():
     global gByMykelApiItems
     gByMykelApiItems.clear()
     logger.sendMessage("Loading ByMykel Items")
-    data = file_handler.loadJson(definitions.PATH_DATA_API_BYMYKEL_CSGO_API_ITEMS)
+    data = file_handler.loadJson(str(definitions.PATH_DATA_API_BYMYKEL_CSGO_API_ITEMS))
     if not data:
         logger.warnMessage("No ByMykel CSGO Api Items found. Could not load, run --bymykel if you need to create ready files")
         return
@@ -43,7 +43,7 @@ def refreshBymykelItems():
     res = requests.get("https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/skins.json")
     response.sendFastResponseMessage(res)
     if res.status_code != 200: return res
-    file_handler.writeFile(definitions.PATH_DATA_API_BYMYKEL_CSGO_API_ITEMS, json.dumps(res.json()))
+    file_handler.writeFile(str(definitions.PATH_DATA_API_BYMYKEL_CSGO_API_ITEMS), json.dumps(res.json()))
     logger.sendMessage("Finished")
     loadByMykelItems()
     return res

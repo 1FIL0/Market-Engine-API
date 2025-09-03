@@ -14,7 +14,7 @@ def updateServer():
     envPath: Path = Path(__file__).resolve().parents[3] / ".env"
     _ = env.loadEnv(envPath)
     logger.sendMessage("Pushing ready items to server")
-    data: dict[str, Any] = file_handler.loadJson(definitions.PATH_DATA_API_READY_ITEMS)
+    data: dict[str, Any] = file_handler.loadJson(str(definitions.PATH_DATA_API_READY_ITEMS))
     try:
         res = requests.post(
             definitions.URL_MARKET_ENGINE_UPDATE_ITEMS,
@@ -35,5 +35,5 @@ def updateServer():
 
 def updateLocal():
     logger.sendMessage("Copying ready items to client")
-    file_handler.copyFile(definitions.PATH_DATA_API_READY_ITEMS, definitions.PATH_DATA_CLIENT_READY_ITEMS)
+    file_handler.copyFile(str(definitions.PATH_DATA_API_READY_ITEMS), str(definitions.PATH_DATA_CLIENT_READY_ITEMS))
     logger.sendMessage("Done")
