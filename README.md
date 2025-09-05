@@ -1,39 +1,29 @@
 ![](readme_assets/market_engine_api.png)
+
 # Market Engine API
+
 ## Overview
-An API that combines fetching steam market item prices with various other item data, 
-such as min/max float values and collections. Mandatory for the Market Engine Client.  
-Website: https://marketengine.onefil.dev
+
+A CLI program that combines steam market item prices with various other item data,
+such as min/max float values and collections.
+You may use your own copy of this software, or just fetch items from our server via the client app. Note that running this API yourself requires you to purchase a SteamWebAPI key
+
+## Website
+
+https://marketengine.onefil.dev
 
 ## Download
-For prebuilt archives, head over to https://marketengine.onefil.dev.
+
+A Windows executable and Linux Appimage can be downloaded from https://marketengine.onefil.dev/downloads.
 
 ## How to use
-If you wish to run the API yourself, here are the steps:  
-1: Pay for a Steam Web API Key.  
-2: Run the program with flags.
 
-flags:  
-```--bymykel``` - refreshes ByMykel CSGO API items. You should only call this once.  
-```--assets``` - fetch all skin images. You should only call this once.  
-```--steamwebapi``` - refreshes Steam Web API Items.  
-```--steamwebapi-key XXXXX``` - provide your key for the Steam Web API.  
-```--process``` - create items that are ready to be in use with the client.  
-```--sync local``` - sync ready items locally to your client data folder.  
-```--interval-sec``` - rerun every x seconds.
+If you wish to run the API yourself, refer to the documentation at https://marketengine.onefil.dev/docs in the API section.
 
 ## Compile from source
+
 Building happens in the shell network, follow instructions at https://github.com/1FIL0/Market-Engine-Shell-Network.
 
 ## LICENCE
+
 This project is licenced under the GPL V3.0 licence.
-
-
-
-
-
-
-
-
-
-
