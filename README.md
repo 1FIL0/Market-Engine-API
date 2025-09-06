@@ -21,7 +21,7 @@ If you wish to run the API yourself, refer to the documentation at https://marke
 
 ## Compile from source
 
-Building happens in the shell network, follow instructions at https://github.com/1FIL0/Market-Engine-Shell-Network.
+Building happens in the shell network. Follow the instructions at https://github.com/1FIL0/Market-Engine-Shell-Network.
 
 ## LICENCE
 
