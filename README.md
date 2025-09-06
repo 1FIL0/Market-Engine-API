@@ -4,9 +4,8 @@
 
 ## Overview
 
-A CLI program that combines steam market item prices with various other item data,
-such as min/max float values and collections.
-You may use your own copy of this software, or just fetch items from our server via the client app. Note that running this API yourself requires you to purchase a SteamWebAPI key
+A CLI program that fetches Steam CS2 market skin prices, and various other item data,
+such as item float ranges and collections. Note that running this API yourself requires you to purchase a third party API key.
 
 ## Website
 
