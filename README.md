@@ -15,7 +15,7 @@ https://marketengine.onefil.dev
 
 ## Download
 
-A Windows executable and Linux Appimage can be downloaded from https://marketengine.onefil.dev/downloads.
+A Windows 7zip archive and Linux Appimage can be downloaded from https://marketengine.onefil.dev/downloads.
 
 ## How to use
 
