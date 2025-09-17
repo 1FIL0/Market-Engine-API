@@ -10,8 +10,9 @@ import requests
 from pathlib import Path
 import env
 
-def updateServer():
-    envPath: Path = Path(__file__).resolve().parents[3] / ".env"
+def updateServer(envPath: str = ""):
+    if not envPath:
+        envPath: Path = Path(__file__).resolve().parents[3] / ".env"
     _ = env.loadEnv(envPath)
     logger.sendMessage("Pushing ready items to server")
     data: dict[str, Any] = file_handler.loadJson(str(definitions.PATH_DATA_API_READY_ITEMS))

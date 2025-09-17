@@ -72,14 +72,12 @@ def loadValuesToItem(item: MarketItem, entry: dict[Any, Any]):
     else:
         logger.warnMessage(f"NON STEAM MARKET URL DETECTED: {url}")
 
-def refreshSteamWebApiItems(customSteamWebAPIKey: str = ""):
-    if shared_args.argDist == "dev":
+def refreshSteamWebApiItems(envPath: str):
+    if not envPath:
         envPath: Path = Path(__file__).resolve().parents[3] / ".env"
-        env.loadEnv(envPath)
+    env.loadEnv(envPath)
     logger.sendMessage("Fetching Steam Web API Items")
     steamWebAPIKey = os.getenv("STEAM_WEB_API_KEY")
-    if customSteamWebAPIKey: 
-        steamWebAPIKey = customSteamWebAPIKey
     
     res = requests.get(f"https://www.steamwebapi.com/steam/api/items?key={steamWebAPIKey}&game=cs2")
     response.sendFastResponseMessage(res)
