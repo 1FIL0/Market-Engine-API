@@ -53,7 +53,7 @@ def createReadyItems():
     logger.sendMessage("Finished")
 
 def loadValuesToReadyItem(readyItem: MarketItem, bymykelItem: MarketItem, steamwebItem: MarketItem):
-    if definitions.collectionToInt(bymykelItem.collection) == -1:
+    if bymykelItem.collection < 0 or bymykelItem.collection > definitions.consts.COLLECTION_MAX:
         logger.sendMessage(f"Unknown collection: {str(bymykelItem.collection)}")
         return -1
     readyItem.tempID = len(gReadyItems)
