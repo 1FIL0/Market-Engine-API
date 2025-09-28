@@ -46,12 +46,16 @@ def createReadyItems():
             continue
         bymykelItem = bymykelDict[key]
         readyItem = MarketItem()
-        loadValuesToReadyItem(readyItem, bymykelItem, steamwebItem)
+        if loadValuesToReadyItem(readyItem, bymykelItem, steamwebItem) != 0:
+            continue
         gReadyItems.append(readyItem)
     saveReadyItems()
     logger.sendMessage("Finished")
 
 def loadValuesToReadyItem(readyItem: MarketItem, bymykelItem: MarketItem, steamwebItem: MarketItem):
+    if definitions.collectionToInt(bymykelItem) == -1:
+        logger.sendMessage(f"Unknown collection: {str(bymykelItem.collection)}")
+        return -1
     readyItem.tempID = len(gReadyItems)
     readyItem.permID = steamwebItem.permID
     readyItem.weaponName = bymykelItem.weaponName
@@ -75,6 +79,7 @@ def loadValuesToReadyItem(readyItem: MarketItem, bymykelItem: MarketItem, steamw
         readyItem.tradeupable = True
     if gradeInt > maxCollectionGrade:
         logger.warnMessage(f"{readyItem.weaponName} {readyItem.skinName} has a higher grade than collection")
+    return 0
 
 def saveReadyItems():
     logger.sendMessage("Saving Ready Items")
