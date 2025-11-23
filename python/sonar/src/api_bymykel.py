@@ -39,8 +39,14 @@ def loadByMykelItems():
         return
     for dataItem in data:
         byMykelItem = MarketItem()
-        item_utils.pushSplitItemName(dataItem["name"], byMykelItem)
-        byMykelItem.fullName = dataItem["name"]
+
+        # Remove star symbol on knives
+        fullName = dataItem["name"]
+        if "\u2605" in fullName:
+            fullName = fullName.replace("\u2605", "").strip()
+
+        item_utils.pushSplitItemName(fullName, byMykelItem)
+        byMykelItem.fullName = fullName
 
         if "collections" in dataItem and isinstance(dataItem["collections"], list) and dataItem["collections"]:
             for collection in dataItem["collections"]:
