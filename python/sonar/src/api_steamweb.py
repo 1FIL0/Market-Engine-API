@@ -76,6 +76,11 @@ def loadValuesToItem(item: MarketItem, entry: dict[Any, Any]):
         if gradeStr.startswith("Covert"): item.grade = definitions.consts.GRADE_COVERT
         if gradeStr.startswith("Contraband"): item.grade = definitions.consts.GRADE_CONTRABAND
 
+    # KNIFE / GLOVES HAVE CUSTOM SPECIAL RARITY (STAR)
+    tag = entry["tag1"]
+    if tag == "Knife" or tag == "Gloves":
+        item.grade = definitions.consts.GRADE_STAR
+
     price: float = 0.0
     if entry["pricemedian7d"] and not price: price = entry["pricemedian7d"]
     if entry["pricemedian"] and not price: price = entry["pricemedian"]

@@ -40,7 +40,7 @@ def loadByMykelItems():
     for dataItem in data:
         byMykelItem = MarketItem()
 
-        # Remove star symbol on knives
+        # Remove star symbol on knives/gloves
         fullName = dataItem["name"]
         if "\u2605" in fullName:
             fullName = fullName.replace("\u2605", "").strip()
@@ -51,6 +51,11 @@ def loadByMykelItems():
         if "collections" in dataItem and isinstance(dataItem["collections"], list) and dataItem["collections"]:
             for collection in dataItem["collections"]:
                 byMykelItem.collection = definitions.collectionToInt(collection["name"])
+                
+        if "crates" in dataItem and isinstance(dataItem["crates"], list) and dataItem["crates"]:
+            for crate in dataItem["crates"]:
+                byMykelItem.crates.append(definitions.crateToInt(crate))
+
         byMykelItem.category = definitions.consts.CATEGORY_NORMAL
         if "stattrak" in dataItem and dataItem["stattrak"]:
             byMykelItem.category = definitions.consts.CATEGORY_STAT_TRAK

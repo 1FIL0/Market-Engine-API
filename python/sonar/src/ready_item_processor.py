@@ -53,9 +53,6 @@ def createReadyItems():
     logger.sendMessage("Finished")
 
 def loadValuesToReadyItem(readyItem: MarketItem, bymykelItem: MarketItem, steamwebItem: MarketItem):
-    if bymykelItem.collection < 0 or bymykelItem.collection > definitions.consts.COLLECTION_MAX:
-        logger.sendMessage(f"Unknown collection: {str(bymykelItem.collection)} for {bymykelItem.fullName}")
-        return -1
     readyItem.tempID = len(gReadyItems)
     readyItem.permID = steamwebItem.permID
     readyItem.weaponName = bymykelItem.weaponName
@@ -64,6 +61,7 @@ def loadValuesToReadyItem(readyItem: MarketItem, bymykelItem: MarketItem, steamw
     readyItem.minFloat = bymykelItem.minFloat
     readyItem.maxFloat = bymykelItem.maxFloat
     readyItem.collection = bymykelItem.collection
+    readyItem.crates = bymykelItem.crates
     readyItem.category = steamwebItem.category
     readyItem.grade = steamwebItem.grade
     readyItem.wear = steamwebItem.wear
