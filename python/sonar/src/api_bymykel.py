@@ -53,8 +53,13 @@ def loadByMykelItems():
                 byMykelItem.collection = definitions.collectionToInt(collection["name"])
                 
         if "crates" in dataItem and isinstance(dataItem["crates"], list) and dataItem["crates"]:
-            for crate in dataItem["crates"]:
-                byMykelItem.crates.append(definitions.crateToInt(crate))
+            for crateEntry in dataItem["crates"]:
+                crateName = crateEntry["name"]
+                crate = definitions.crateToInt(crateName)
+                # Sometimes has random souvenir crates, skip them as they're unrecognized by Market Engine
+                if crate == definitions.consts.CRATE_UNKNOWN:
+                    continue
+                byMykelItem.crates.append(crateName)
 
         byMykelItem.category = definitions.consts.CATEGORY_NORMAL
         if "stattrak" in dataItem and dataItem["stattrak"]:

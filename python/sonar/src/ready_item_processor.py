@@ -46,8 +46,7 @@ def createReadyItems():
             continue
         bymykelItem = bymykelDict[key]
         readyItem = MarketItem()
-        if loadValuesToReadyItem(readyItem, bymykelItem, steamwebItem) != 0:
-            continue
+        loadValuesToReadyItem(readyItem, bymykelItem, steamwebItem)
         gReadyItems.append(readyItem)
     saveReadyItems()
     logger.sendMessage("Finished")
@@ -70,14 +69,22 @@ def loadValuesToReadyItem(readyItem: MarketItem, bymykelItem: MarketItem, steamw
     readyItem.imageName = f"{readyItem.weaponName}.{readyItem.skinName}.{definitions.categoryToString(readyItem.category)}.{definitions.wearToString(readyItem.wear)}.ico"
     readyItem.steamMarketUrl = steamwebItem.steamMarketUrl
     gradeInt = readyItem.grade
-    maxCollectionGrade = definitions.getMaxCollectionGrade(readyItem.collection)
-    if (gradeInt == maxCollectionGrade):
-        readyItem.tradeupable = False
-    else:
-        readyItem.tradeupable = True
-    if gradeInt > maxCollectionGrade:
-        logger.warnMessage(f"{readyItem.weaponName} {readyItem.skinName} has a higher grade than collection")
-    return 0
+    
+    tradeupable = False
+    # Star/Contraband items cant be traded up
+    if gradeInt == definitions.consts.GRADE_STAR or gradeInt == definitions.consts.GRADE_CONTRABAND:
+        tradeupable = False
+        return
+    # If collection has no case and item at collection's max tier, it can't be traded up
+    if definitions.collectionToCrate(readyItem.collection) == definitions.consts.CRATE_UNKNOWN and definitions.getMaxCollectionGrade(readyItem.collection) == readyItem.grade:
+        tradeupable = False
+        return
+    # If case has no higher rarity than the item, it can't be traded up, aka no covert to star tradeup
+    if len(readyItem.crates) > 0 and definitions.getMaxCrateGrade(definitions.crateToInt(readyItem.crates[0])) == readyItem.grade:
+        tradeupable = False
+        return
+    tradeupable = True
+    readyItem.tradeupable = tradeupable
 
 def saveReadyItems():
     logger.sendMessage("Saving Ready Items")
@@ -103,6 +110,7 @@ def loadReadyItemsFromJson():
         readyItem.marketPrice = entry["Market Price"]
         readyItem.tradeupable = entry["Tradeupable"]
         readyItem.collection = entry["Collection"]
+        readyItem.crates = entry["Crates"]
         readyItem.minFloat = entry["Min Float"]
         readyItem.maxFloat = entry["Max Float"]
         readyItem.imageName = entry["Image Name"]
@@ -124,6 +132,7 @@ def readyItemToJson(readyItem: MarketItem):
         "Market Price": readyItem.marketPrice,
         "Tradeupable": readyItem.tradeupable,
         "Collection": definitions.collectionToString(readyItem.collection),
+        "Crates": readyItem.crates,
         "Min Float": readyItem.minFloat,
         "Max Float": readyItem.maxFloat,
         "Image Name": readyItem.imageName,
