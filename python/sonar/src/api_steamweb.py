@@ -65,6 +65,8 @@ def loadValuesToItem(item: MarketItem, entry: dict[Any, Any]):
         if categoryStr.startswith("Norm"): item.category = definitions.consts.CATEGORY_NORMAL
         elif categoryStr.startswith("Stat"): item.category = definitions.consts.CATEGORY_STAT_TRAK
         elif categoryStr.startswith("Souv"): item.category = definitions.consts.CATEGORY_SOUVENIR
+        else:
+            item.category = definitions.consts.CATEGORY_NORMAL
 
     gradeStr: str = entry["rarity"]
     if gradeStr:
