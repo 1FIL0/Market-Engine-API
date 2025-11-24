@@ -39,12 +39,28 @@ def loadByMykelItems():
         return
     for dataItem in data:
         byMykelItem = MarketItem()
-        item_utils.pushSplitItemName(dataItem["name"], byMykelItem)
-        byMykelItem.fullName = dataItem["name"]
+
+        # Remove star symbol on knives/gloves
+        fullName = dataItem["name"]
+        if "\u2605" in fullName:
+            fullName = fullName.replace("\u2605", "").strip()
+
+        item_utils.pushSplitItemName(fullName, byMykelItem)
+        byMykelItem.fullName = fullName
 
         if "collections" in dataItem and isinstance(dataItem["collections"], list) and dataItem["collections"]:
             for collection in dataItem["collections"]:
                 byMykelItem.collection = definitions.collectionToInt(collection["name"])
+                
+        if "crates" in dataItem and isinstance(dataItem["crates"], list) and dataItem["crates"]:
+            for crateEntry in dataItem["crates"]:
+                crateName = crateEntry["name"]
+                crate = definitions.crateToInt(crateName)
+                # Sometimes has random souvenir crates, skip them as they're unrecognized by Market Engine
+                if crate == definitions.consts.CRATE_UNKNOWN:
+                    continue
+                byMykelItem.crates.append(crateName)
+
         byMykelItem.category = definitions.consts.CATEGORY_NORMAL
         if "stattrak" in dataItem and dataItem["stattrak"]:
             byMykelItem.category = definitions.consts.CATEGORY_STAT_TRAK
