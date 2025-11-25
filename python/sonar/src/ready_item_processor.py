@@ -50,7 +50,7 @@ def createReadyItems() -> None:
         readyItem = MarketItem()
         combineValuesToReadyItem(readyItem, bymykelItem, steamwebItem)
         insertReadyItem(readyItem)
-    pushTradeupValuesToReadyItems()
+    sortReadyItems()
     saveReadyItems()
     logger.sendMessage("Finished")
 
@@ -90,26 +90,37 @@ def combineValuesToReadyItem(readyItem: MarketItem, bymykelItem: ItemByMykel, st
     readyItem.imageName = f"{readyItem.weaponName}.{readyItem.skinName}.{definitions.categoryToString(readyItem.category)}.{definitions.wearToString(readyItem.wear)}.ico"
     readyItem.steamMarketUrl = steamwebItem.steamMarketUrl
 
-def pushTradeupValuesToReadyItems() -> None:
+def sortReadyItems() -> None:
     global g_readyItems
     global g_readyItemsCollectionCategoryGradeWear
+    sortIDS()
     for readyItem in g_readyItems:
-        tradeupable = False
-        # Star/Contraband items cant be traded up
-        if readyItem.grade == definitions.consts.GRADE_STAR or readyItem.grade == definitions.consts.GRADE_CONTRABAND:
-            tradeupable = False
-            continue
-        # If collection has no crate and item at collection's max tier, it can't be traded up
-        if definitions.collectionToCrate(readyItem.collection) == definitions.consts.CRATE_UNKNOWN and definitions.getMaxCollectionGrade(readyItem.collection) == readyItem.grade:
-            tradeupable = False
-            continue
-        # If crate has no higher rarity than the item, it can't be traded up, aka no covert to star tradeup
-        if len(readyItem.crates) > 0 and definitions.getMaxCrateGrade(definitions.crateToInt(readyItem.crates[0])) == readyItem.grade:
-            tradeupable = False
-            continue
+        pushReadyItemTradeupableStatus(readyItem)
 
-        tradeupable = True
-        readyItem.tradeupable = tradeupable
+# ! THIS FUNCTION ORGANISES ITEMS IN SUCH A WAY THAT IS LATER USED BY THE MARKET ENGINE CLIENT TRADEUP ENGINE.
+# ! ALLOWS FOR FAST FLAT MEMORY ACCESS AND NO NESTED VECTORS, WHICH IS IS GREAT ESPECIALLY FOR THE GPU, AND IS THE CORE OF THE ALGORITHM
+def sortIDS() -> None:
+    global g_readyItems
+    logger.sendMessage("Sorting IDS")
+    g_readyItems.sort(key=lambda item: (item.collection, item.grade, item.fullName, item.category, item.wear))
+
+        
+def pushReadyItemTradeupableStatus(readyItem: MarketItem) -> None:
+    tradeupable = False
+    # Star/Contraband items cant be traded up
+    if readyItem.grade == definitions.consts.GRADE_STAR or readyItem.grade == definitions.consts.GRADE_CONTRABAND:
+        tradeupable = False
+        return
+    # If collection has no crate and item at collection's max tier, it can't be traded up
+    if definitions.collectionToCrate(readyItem.collection) == definitions.consts.CRATE_UNKNOWN and definitions.getMaxCollectionGrade(readyItem.collection) == readyItem.grade:
+        tradeupable = False
+        return
+    # If crate has no higher rarity than the item, it can't be traded up, aka no covert to star tradeup
+    if len(readyItem.crates) > 0 and definitions.getMaxCrateGrade(definitions.crateToInt(readyItem.crates[0])) == readyItem.grade:
+        tradeupable = False
+        return
+    tradeupable = True
+    readyItem.tradeupable = tradeupable
         
 def insertReadyItem(readyItem: MarketItem) -> None:
     g_readyItems.append(readyItem)

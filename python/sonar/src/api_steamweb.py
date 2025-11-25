@@ -103,7 +103,7 @@ def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> None:
     else:
         logger.warnMessage(f"NON STEAM MARKET URL DETECTED: {url}")
 
-def refreshSteamWebApiItems(envPath: str):
+def refreshSteamWebApiItems(envPath: str) -> requests.Response:
     if not envPath:
         envPath: Path = Path(__file__).resolve().parents[3] / ".env"
     env.loadEnv(envPath)
@@ -118,6 +118,6 @@ def refreshSteamWebApiItems(envPath: str):
     loadSteamWebApiItems()
     return res
 
-def getItems():
+def getItems() -> list[ItemSteamweb]:
     global gSteamWebApiItems
     return gSteamWebApiItems
