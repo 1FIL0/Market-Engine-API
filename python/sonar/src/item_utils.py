@@ -28,3 +28,4 @@ def pushSplitItemName(fullName: str, item: MarketItem):
         item.skinName = skinName
     else:
         item.weaponName = fullName
+        item.skinName = fullName

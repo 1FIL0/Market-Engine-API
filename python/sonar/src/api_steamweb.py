@@ -50,7 +50,11 @@ def loadSteamWebApiItems():
 
 def loadValuesToItem(item: MarketItem, entry: dict[Any, Any]):
     item.fullName = entry["groupname"]
+    # Remove star symbol on knives/gloves
+    if "\u2605" in item.fullName:
+        item.fullName = item.fullName.replace("\u2605", "").strip()
     item_utils.pushSplitItemName(item.fullName, item)
+    item.fullName.replace("  ", " ")
 
     wearStr: str = entry["wear"]
     if wearStr:
@@ -59,6 +63,7 @@ def loadValuesToItem(item: MarketItem, entry: dict[Any, Any]):
         elif wearStr == "ft": item.wear = definitions.consts.WEAR_FIELD_TESTED
         elif wearStr == "ww": item.wear = definitions.consts.WEAR_WELL_WORN
         elif wearStr == "bs": item.wear = definitions.consts.WEAR_BATTLE_SCARRED
+        elif wearStr == "np": item.wear = definitions.consts.WEAR_NO_WEAR
 
     categoryStr: str = entry["quality"]
     if categoryStr:

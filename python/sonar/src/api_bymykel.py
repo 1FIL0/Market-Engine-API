@@ -48,6 +48,10 @@ def loadByMykelItems():
         item_utils.pushSplitItemName(fullName, byMykelItem)
         byMykelItem.fullName = fullName
 
+        # Sometimes skins have it's weapon name only, like vanilla knives
+        if (byMykelItem.weaponName == byMykelItem.skinName):
+            byMykelItem.fullName = f"{byMykelItem.weaponName} | {byMykelItem.skinName}"
+
         if "collections" in dataItem and isinstance(dataItem["collections"], list) and dataItem["collections"]:
             for collection in dataItem["collections"]:
                 byMykelItem.collection = definitions.collectionToInt(collection["name"])
@@ -66,8 +70,10 @@ def loadByMykelItems():
             byMykelItem.category = definitions.consts.CATEGORY_STAT_TRAK
         if "souvenir" in dataItem and dataItem["souvenir"]:
             byMykelItem.category = definitions.consts.CATEGORY_SOUVENIR
-        byMykelItem.minFloat = dataItem["min_float"]
-        byMykelItem.maxFloat = dataItem["max_float"]
+
+        # Some special skins have null float ranges. such as vanilla knives
+        if dataItem["min_float"]: byMykelItem.minFloat = dataItem["min_float"]
+        if dataItem["max_float"]: byMykelItem.maxFloat = dataItem["max_float"]
         gByMykelApiItems.append(byMykelItem)
     logger.sendMessage("Done")
 
