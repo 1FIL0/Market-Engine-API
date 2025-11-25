@@ -63,7 +63,7 @@ def loadByMykelItems() -> None:
                 # Sometimes has random souvenir crates, skip them as they're unrecognized by Market Engine
                 if crate == definitions.consts.CRATE_UNKNOWN:
                     continue
-                byMykelItem.crates.append(crateName)
+                byMykelItem.crates.append(crate)
 
         byMykelItem.category = definitions.consts.CATEGORY_NORMAL
         if "stattrak" in dataItem and dataItem["stattrak"]:

@@ -36,7 +36,7 @@ argParser.add_argument("--interval-sec")
 argParser.add_argument("--env")
 args, unknownArgs = argParser.parse_known_args()
 
-def main():
+def main() -> None:
     validator.validateFiles()
     while (1):
         envPath = ""
