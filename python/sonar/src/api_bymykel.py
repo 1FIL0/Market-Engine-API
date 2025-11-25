@@ -22,14 +22,14 @@ import requests
 import logger
 import file_handler
 import definitions
-from item import MarketItem
+from item_bymykel import ItemByMykel
 import item_utils
 import json
 import response
 
-gByMykelApiItems: list[MarketItem] = list()
+gByMykelApiItems: list[ItemByMykel] = list()
 
-def loadByMykelItems():
+def loadByMykelItems() -> None:
     global gByMykelApiItems
     gByMykelApiItems.clear()
     logger.sendMessage("Loading ByMykel Items")
@@ -38,7 +38,7 @@ def loadByMykelItems():
         logger.warnMessage("No ByMykel CSGO Api Items found. Could not load, run --bymykel if you need to create ready files")
         return
     for dataItem in data:
-        byMykelItem = MarketItem()
+        byMykelItem = ItemByMykel()
 
         # Remove star symbol on knives/gloves
         fullName = dataItem["name"]
@@ -72,12 +72,12 @@ def loadByMykelItems():
             byMykelItem.category = definitions.consts.CATEGORY_SOUVENIR
 
         # Some special skins have null float ranges. such as vanilla knives
-        if dataItem["min_float"]: byMykelItem.minFloat = dataItem["min_float"]
-        if dataItem["max_float"]: byMykelItem.maxFloat = dataItem["max_float"]
+        byMykelItem.minFloat = dataItem["min_float"]
+        byMykelItem.maxFloat = dataItem["max_float"]
         gByMykelApiItems.append(byMykelItem)
     logger.sendMessage("Done")
 
-def refreshBymykelItems():
+def refreshBymykelItems() -> None:
     logger.sendMessage("Getting ByMykel CSGO Api items")
     res = requests.get("https://raw.githubusercontent.com/ByMykel/CSGO-API/main/public/api/en/skins.json")
     response.sendFastResponseMessage(res)
@@ -87,6 +87,6 @@ def refreshBymykelItems():
     loadByMykelItems()
     return res
 
-def getItems():
+def getItems() -> list[ItemByMykel]:
     global gByMykelApiItems
     return gByMykelApiItems

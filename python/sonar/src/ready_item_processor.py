@@ -22,15 +22,17 @@ sys.path.insert(0, path.PATH_SHARE)
 import logger
 import file_handler
 import definitions
-from item import MarketItem
+from market_item import MarketItem
+from item_bymykel import ItemByMykel
+from item_steamweb import ItemSteamweb
 import api_bymykel
 import api_steamweb
 
-gReadyItems: list[MarketItem] = list()
+g_readyItems: list[MarketItem] = list()
+g_readyItemsCollectionCategoryGradeWear: list[list[list[list[list[MarketItem]]]]] = list() # X_X
 
 def createReadyItems():
-    global gReadyItems
-    gReadyItems.clear()
+    clearArrays()
     api_bymykel.loadByMykelItems()
     api_steamweb.loadSteamWebApiItems()
     bymykelItems = api_bymykel.getItems()
@@ -47,13 +49,31 @@ def createReadyItems():
         bymykelItem = bymykelDict[key]
         readyItem = MarketItem()
         loadValuesToReadyItem(readyItem, bymykelItem, steamwebItem)
-        gReadyItems.append(readyItem)
+        pushReadyItem(readyItem)
     saveReadyItems()
     logger.sendMessage("Finished")
 
-def loadValuesToReadyItem(readyItem: MarketItem, bymykelItem: MarketItem, steamwebItem: MarketItem):
-    readyItem.tempID = len(gReadyItems)
-    readyItem.permID = steamwebItem.permID
+def clearArrays():
+    global g_readyItems
+    global g_readyItemsCollectionCategoryGradeWear
+    g_readyItems.clear()
+    g_readyItemsCollectionCategoryGradeWear = [
+        [
+            [
+                [
+                    [
+
+                    ] 
+                    for _ in range(definitions.consts.WEAR_MAX)
+                ]
+                for _ in range(definitions.consts.GRADE_MAX)
+            ]
+            for _ in range(definitions.consts.CATEGORY_MAX)
+        ]
+        for _ in range(definitions.consts.COLLECTION_MAX)
+    ]
+
+def loadValuesToReadyItem(readyItem: MarketItem, bymykelItem: ItemByMykel, steamwebItem: ItemSteamweb):
     readyItem.weaponName = bymykelItem.weaponName
     readyItem.skinName = bymykelItem.skinName
     readyItem.fullName = f"{readyItem.weaponName} {readyItem.skinName}"
@@ -69,7 +89,7 @@ def loadValuesToReadyItem(readyItem: MarketItem, bymykelItem: MarketItem, steamw
     readyItem.imageName = f"{readyItem.weaponName}.{readyItem.skinName}.{definitions.categoryToString(readyItem.category)}.{definitions.wearToString(readyItem.wear)}.ico"
     readyItem.steamMarketUrl = steamwebItem.steamMarketUrl
     gradeInt = readyItem.grade
-    
+        
     tradeupable = False
     # Star/Contraband items cant be traded up
     if gradeInt == definitions.consts.GRADE_STAR or gradeInt == definitions.consts.GRADE_CONTRABAND:
@@ -79,28 +99,35 @@ def loadValuesToReadyItem(readyItem: MarketItem, bymykelItem: MarketItem, steamw
     if definitions.collectionToCrate(readyItem.collection) == definitions.consts.CRATE_UNKNOWN and definitions.getMaxCollectionGrade(readyItem.collection) == readyItem.grade:
         tradeupable = False
         return
-    # If case has no higher rarity than the item, it can't be traded up, aka no covert to star tradeup
+    # If case has no higher rarity than the item, it can't be traded up, aka covert to star tradeup doesnt exist
     if len(readyItem.crates) > 0 and definitions.getMaxCrateGrade(definitions.crateToInt(readyItem.crates[0])) == readyItem.grade:
         tradeupable = False
         return
     tradeupable = True
     readyItem.tradeupable = tradeupable
+        
+def pushReadyItem(readyItem: MarketItem):
+    g_readyItems.append(readyItem)
+    # these items have no collection, instead they're in crates
+    if readyItem.grade == definitions.consts.GRADE_STAR or readyItem.grade == definitions.consts.GRADE_CONTRABAND:
+        for crate in readyItem.crates:
+            outputCollection = definitions.crateToCollection(definitions.crateToInt(crate))
+            if outputCollection == -1: continue
+            g_readyItemsCollectionCategoryGradeWear[outputCollection][readyItem.category][readyItem.grade][readyItem.wear]
 
 def saveReadyItems():
     logger.sendMessage("Saving Ready Items")
     finalJsonData: dict[str, Any] = {"DATA": []}
-    for readyItem in gReadyItems:
+    for readyItem in g_readyItems:
         finalJsonData["DATA"].append(readyItemToJson(readyItem))
     file_handler.replaceJsonDataAtomic(str(definitions.PATH_DATA_API_READY_ITEMS), finalJsonData)
     logger.sendMessage("Saved")
 
 def loadReadyItemsFromJson():
-    global gReadyItems
+    global g_readyItems
     data = file_handler.loadJson(str(definitions.PATH_DATA_API_READY_ITEMS))
     for entry in data["DATA"]:
         readyItem = MarketItem()
-        readyItem.tempID = entry["Temp ID"]
-        readyItem.permID = entry["Perm ID"]
         readyItem.weaponName = entry["Weapon Name"]
         readyItem.skinName = entry["Skin Name"]
         readyItem.fullName = entry["Full Name"]
@@ -117,12 +144,10 @@ def loadReadyItemsFromJson():
         readyItem.imageUrl = entry["Image URL"]
         readyItem.imageName = entry["Image Name"]
         readyItem.steamMarketUrl = entry["Steam Market URL"]
-        gReadyItems.append(readyItem)
+        g_readyItems.append(readyItem)
 
 def readyItemToJson(readyItem: MarketItem):
     jsonData: dict[str, Any] = {
-        "Temp ID": readyItem.tempID,
-        "Perm ID": readyItem.permID,
         "Weapon Name": readyItem.weaponName,
         "Skin Name": readyItem.skinName,
         "Full Name": readyItem.fullName,
@@ -142,5 +167,5 @@ def readyItemToJson(readyItem: MarketItem):
     return jsonData
 
 def getReadyItems():
-    global gReadyItems
-    return gReadyItems
+    global g_readyItems
+    return g_readyItems
