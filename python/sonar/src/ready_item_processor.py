@@ -179,8 +179,6 @@ def loadReadyItemsFromJson() -> None:
         readyItem.imageName = entry["Image Name"]
         readyItem.steamMarketUrl = entry["Steam Market URL"]
         g_readyItems.append(readyItem)
-from dataclasses import dataclass, asdict
-import json
 
 def readyItemToJson(readyItem: MarketItem) -> None:
     cratesStringified: list[str] = []
