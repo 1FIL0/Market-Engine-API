@@ -125,13 +125,6 @@ def pushReadyItemOutputs(readyItem: MarketItem) -> None:
     collectionItemsWearArray = g_readyItemsCollectionCategoryGradeWear[readyItem.collection][readyItem.category][readyItem.grade + 1]
     for wear in range(len(collectionItemsWearArray)):
         for collectionItem in collectionItemsWearArray[wear]:
-            dupFound = False
-            for possibleOutput in readyItem.possibleOutputs:
-                if collectionItem.fullName == possibleOutput.fullName:
-                    dupFound = True
-                    break
-            if dupFound: 
-                continue
             readyItem.possibleOutputs.append(collectionItem)
 
 def insertReadyItem(readyItem: MarketItem) -> None:
@@ -178,6 +171,7 @@ def loadReadyItemsFromJson() -> None:
             item.tempAccessID = possibleOutput["Temp Access ID"]
             item.permID = possibleOutput["Perm ID"]
             item.fullName = possibleOutput["Full Name"]
+            item.wear = possibleOutput["Wear"]
             readyItem.possibleOutputs.append(item)
 
         readyItem.imageName = entry["Image Name"]
@@ -197,7 +191,8 @@ def readyItemToJson(readyItem: MarketItem) -> None:
         outputItemEntry = {
             "Temp Access ID": output.tempAccessID,
             "Perm ID": output.permID,
-            "Full Name": output.fullName
+            "Full Name": output.fullName,
+            "Wear": definitions.wearToString(output.wear)
         }
         outputsDict.append(outputItemEntry)
 
