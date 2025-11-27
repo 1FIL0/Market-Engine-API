@@ -55,6 +55,7 @@ def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> None:
         item.fullName = item.fullName.replace("\u2605", "").strip()
     item_utils.pushSplitItemName(item.fullName, item)
     item.fullName.replace("  ", " ")
+    item.permID = int(entry["id"], 16)
 
     wearStr: str = entry["wear"]
     if wearStr:

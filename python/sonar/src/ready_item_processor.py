@@ -27,9 +27,10 @@ from item_bymykel import ItemByMykel
 from item_steamweb import ItemSteamweb
 import api_bymykel
 import api_steamweb
+from collections import defaultdict
 
 g_readyItems: list[MarketItem] = list()
-g_readyItemsCollectionCategoryGradeWear: list[list[list[list[list[MarketItem]]]]] = list() # X_X
+g_readyItemsCollectionCategoryGradeWear: list[list[list[list[list[MarketItem]]]]] = list()
 
 def createReadyItems() -> None:
     clearArrays()
@@ -75,6 +76,7 @@ def clearArrays() -> None:
     ]
 
 def combineValuesToReadyItem(readyItem: MarketItem, bymykelItem: ItemByMykel, steamwebItem: ItemSteamweb) -> None:
+    readyItem.permID = steamwebItem.permID
     readyItem.weaponName = bymykelItem.weaponName
     readyItem.skinName = bymykelItem.skinName
     readyItem.fullName = f"{readyItem.weaponName} {readyItem.skinName}"
@@ -93,18 +95,13 @@ def combineValuesToReadyItem(readyItem: MarketItem, bymykelItem: ItemByMykel, st
 def sortReadyItems() -> None:
     global g_readyItems
     global g_readyItemsCollectionCategoryGradeWear
-    sortIDS()
+    g_readyItems.sort(key=lambda item: (item.collection, item.grade, item.fullName, item.category, item.wear))
+    currentID = 0
     for readyItem in g_readyItems:
+        readyItem.tempAccessID = currentID
+        currentID += 1
         pushReadyItemTradeupableStatus(readyItem)
 
-# ! THIS FUNCTION ORGANISES ITEMS IN SUCH A WAY THAT IS LATER USED BY THE MARKET ENGINE CLIENT TRADEUP ENGINE.
-# ! ALLOWS FOR FAST FLAT MEMORY ACCESS AND NO NESTED VECTORS, WHICH IS IS GREAT ESPECIALLY FOR THE GPU, AND IS THE CORE OF THE ALGORITHM
-def sortIDS() -> None:
-    global g_readyItems
-    logger.sendMessage("Sorting IDS")
-    g_readyItems.sort(key=lambda item: (item.collection, item.grade, item.fullName, item.category, item.wear))
-
-        
 def pushReadyItemTradeupableStatus(readyItem: MarketItem) -> None:
     tradeupable = False
     # Star/Contraband items cant be traded up
@@ -146,6 +143,8 @@ def loadReadyItemsFromJson() -> None:
     data = file_handler.loadJson(str(definitions.PATH_DATA_API_READY_ITEMS))
     for entry in data["DATA"]:
         readyItem = MarketItem()
+        readyItem.tempAccessID = entry["Temp Access ID"]
+        readyItem.permID = entry["Perm ID"]
         readyItem.weaponName = entry["Weapon Name"]
         readyItem.skinName = entry["Skin Name"]
         readyItem.fullName = entry["Full Name"]
@@ -170,6 +169,8 @@ def readyItemToJson(readyItem: MarketItem) -> None:
         cratesStringified.append(definitions.crateToString(crate))
 
     jsonData: dict[str, Any] = {
+        "Temp Access ID": readyItem.tempAccessID,
+        "Perm ID": readyItem.permID,
         "Weapon Name": readyItem.weaponName,
         "Skin Name": readyItem.skinName,
         "Full Name": readyItem.fullName,

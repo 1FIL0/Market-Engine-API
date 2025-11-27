@@ -17,6 +17,7 @@
 
 class ItemSteamweb:
     def __init__(self):
+        self.permID: int = -1
         self.fullName: str = ""
         self.weaponName: str = ""
         self.skinName: str = ""
