@@ -94,13 +94,13 @@ def combineValuesToReadyItem(readyItem: MarketItem, bymykelItem: ItemByMykel, st
 
 def sortReadyItems() -> None:
     global g_readyItems
-    global g_readyItemsCollectionCategoryGradeWear
     g_readyItems.sort(key=lambda item: (item.collection, item.grade, item.fullName, item.category, item.wear))
     currentID = 0
     for readyItem in g_readyItems:
         readyItem.tempAccessID = currentID
         currentID += 1
         pushReadyItemTradeupableStatus(readyItem)
+        pushReadyItemOutputs(readyItem)
 
 def pushReadyItemTradeupableStatus(readyItem: MarketItem) -> None:
     tradeupable = False
@@ -119,16 +119,31 @@ def pushReadyItemTradeupableStatus(readyItem: MarketItem) -> None:
     tradeupable = True
     readyItem.tradeupable = tradeupable
         
+def pushReadyItemOutputs(readyItem: MarketItem) -> None:
+    global g_readyItemsCollectionCategoryGradeWear
+    if not readyItem.tradeupable: return
+    collectionItemsWearArray = g_readyItemsCollectionCategoryGradeWear[readyItem.collection][readyItem.category][readyItem.grade + 1]
+    for wear in range(len(collectionItemsWearArray)):
+        for collectionItem in collectionItemsWearArray[wear]:
+            dupFound = False
+            for possibleOutput in readyItem.possibleOutputs:
+                if collectionItem.fullName == possibleOutput.fullName:
+                    dupFound = True
+                    break
+            if dupFound: 
+                continue
+            readyItem.possibleOutputs.append(collectionItem)
+
 def insertReadyItem(readyItem: MarketItem) -> None:
     g_readyItems.append(readyItem)
     # Star / Contraband items aren't in any collections but the outcomes still depend on their crates
     if readyItem.grade == definitions.consts.GRADE_STAR or readyItem.grade == definitions.consts.GRADE_CONTRABAND:
         for crate in readyItem.crates:
             crateCollection = definitions.crateToCollection(crate)
-            g_readyItemsCollectionCategoryGradeWear[crateCollection][readyItem.category][readyItem.grade][readyItem.wear]
+            g_readyItemsCollectionCategoryGradeWear[crateCollection][readyItem.category][readyItem.grade][readyItem.wear].append(readyItem)
         return
     
-    g_readyItemsCollectionCategoryGradeWear[readyItem.collection][readyItem.category][readyItem.grade][readyItem.wear]
+    g_readyItemsCollectionCategoryGradeWear[readyItem.collection][readyItem.category][readyItem.grade][readyItem.wear].append(readyItem)
 
 def saveReadyItems() -> None:
     logger.sendMessage("Saving Ready Items")
@@ -157,16 +172,34 @@ def loadReadyItemsFromJson() -> None:
         readyItem.crates = entry["Crates"]
         readyItem.minFloat = entry["Min Float"]
         readyItem.maxFloat = entry["Max Float"]
+        
+        for possibleOutput in entry["Possible Outputs"]:
+            item = MarketItem()
+            item.tempAccessID = possibleOutput["Temp Access ID"]
+            item.permID = possibleOutput["Perm ID"]
+            item.fullName = possibleOutput["Full Name"]
+            readyItem.possibleOutputs.append(item)
+
         readyItem.imageName = entry["Image Name"]
         readyItem.imageUrl = entry["Image URL"]
         readyItem.imageName = entry["Image Name"]
         readyItem.steamMarketUrl = entry["Steam Market URL"]
         g_readyItems.append(readyItem)
+from dataclasses import dataclass, asdict
+import json
 
 def readyItemToJson(readyItem: MarketItem) -> None:
     cratesStringified: list[str] = []
     for crate in readyItem.crates:
         cratesStringified.append(definitions.crateToString(crate))
+    outputsDict = []
+    for output in readyItem.possibleOutputs:
+        outputItemEntry = {
+            "Temp Access ID": output.tempAccessID,
+            "Perm ID": output.permID,
+            "Full Name": output.fullName
+        }
+        outputsDict.append(outputItemEntry)
 
     jsonData: dict[str, Any] = {
         "Temp Access ID": readyItem.tempAccessID,
@@ -183,6 +216,7 @@ def readyItemToJson(readyItem: MarketItem) -> None:
         "Crates": cratesStringified,
         "Min Float": readyItem.minFloat,
         "Max Float": readyItem.maxFloat,
+        "Possible Outputs": outputsDict,
         "Image Name": readyItem.imageName,
         "Image URL": readyItem.imageUrl,
         "Steam Market URL": readyItem.steamMarketUrl
