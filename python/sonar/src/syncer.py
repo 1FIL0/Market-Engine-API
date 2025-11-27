@@ -27,7 +27,7 @@ import requests
 from pathlib import Path
 import env
 
-def updateServer(envPath: str = ""):
+def updateServer(envPath: str = "") -> None:
     if not envPath:
         envPath: Path = Path(__file__).resolve().parents[3] / ".env"
     _ = env.loadEnv(envPath)
@@ -51,7 +51,7 @@ def updateServer(envPath: str = ""):
         logger.errorMessage("Something went wrong")
     logger.sendMessage("Done")
 
-def updateLocal():
+def updateLocal() -> None:
     logger.sendMessage("Copying ready items to client")
     file_handler.copyFile(str(definitions.PATH_DATA_API_READY_ITEMS), str(definitions.PATH_DATA_CLIENT_READY_ITEMS))
     logger.sendMessage("Done")

@@ -26,15 +26,15 @@ import requests
 import logger
 import file_handler
 import definitions
-from item import MarketItem
+from item_steamweb import ItemSteamweb
 import response
 import json
 import env
 import shared_args
 
-gSteamWebApiItems: list[MarketItem] = list()
+gSteamWebApiItems: list[ItemSteamweb] = list()
 
-def loadSteamWebApiItems():
+def loadSteamWebApiItems() -> None:
     global gSteamWebApiItems
     gSteamWebApiItems.clear()
     logger.sendMessage("Loading Steam Web Api Items")
@@ -43,18 +43,19 @@ def loadSteamWebApiItems():
         logger.warnMessage("No Steam Web Api Items found. Could not load, run --steamweb if you need to create ready files")
         return
     for entry in data:
-        steamWebItem = MarketItem()
+        steamWebItem = ItemSteamweb()
         loadValuesToItem(steamWebItem, entry)
         gSteamWebApiItems.append(steamWebItem)
     logger.sendMessage("Done")
 
-def loadValuesToItem(item: MarketItem, entry: dict[Any, Any]):
+def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> None:
     item.fullName = entry["groupname"]
     # Remove star symbol on knives/gloves
     if "\u2605" in item.fullName:
         item.fullName = item.fullName.replace("\u2605", "").strip()
     item_utils.pushSplitItemName(item.fullName, item)
     item.fullName.replace("  ", " ")
+    item.permID = int(entry["id"], 16)
 
     wearStr: str = entry["wear"]
     if wearStr:
@@ -97,14 +98,13 @@ def loadValuesToItem(item: MarketItem, entry: dict[Any, Any]):
         price = 0.0
     item.marketPrice = price
     item.imageUrl = entry["itemimage"]
-    item.permID = int(entry["id"], 16)
     url = entry["steamurl"]
     if url.startswith("https://steamcommunity.com"):
         item.steamMarketUrl = entry["steamurl"]
     else:
         logger.warnMessage(f"NON STEAM MARKET URL DETECTED: {url}")
 
-def refreshSteamWebApiItems(envPath: str):
+def refreshSteamWebApiItems(envPath: str) -> requests.Response:
     if not envPath:
         envPath: Path = Path(__file__).resolve().parents[3] / ".env"
     env.loadEnv(envPath)
@@ -119,6 +119,6 @@ def refreshSteamWebApiItems(envPath: str):
     loadSteamWebApiItems()
     return res
 
-def getItems():
+def getItems() -> list[ItemSteamweb]:
     global gSteamWebApiItems
     return gSteamWebApiItems

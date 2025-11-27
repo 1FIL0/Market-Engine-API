@@ -15,17 +15,16 @@
 #* along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #* See LICENCE file.
 
-from market_item import MarketItem
-import re
-
-def pushSplitItemName(fullName: str, item: MarketItem) -> None:
-    if " | " in fullName:
-        cleanedName = re.sub(r'\s*\|\s*', '|', fullName)
-        parts = cleanedName.split('|')
-        weaponName = parts[0].strip()
-        skinName = parts[1].strip()
-        item.weaponName = weaponName
-        item.skinName = skinName
-    else:
-        item.weaponName = fullName
-        item.skinName = fullName
+class ItemSteamweb:
+    def __init__(self):
+        self.permID: int = -1
+        self.fullName: str = ""
+        self.weaponName: str = ""
+        self.skinName: str = ""
+        self.category: int = -1
+        self.grade: int = -1
+        self.wear: int = -1
+        self.marketPrice: float = -1.0
+        self.imageUrl: str = ""
+        self.imageName: str = ""
+        self.steamMarketUrl: str = ""

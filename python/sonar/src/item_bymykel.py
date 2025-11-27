@@ -15,17 +15,13 @@
 #* along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #* See LICENCE file.
 
-from market_item import MarketItem
-import re
-
-def pushSplitItemName(fullName: str, item: MarketItem) -> None:
-    if " | " in fullName:
-        cleanedName = re.sub(r'\s*\|\s*', '|', fullName)
-        parts = cleanedName.split('|')
-        weaponName = parts[0].strip()
-        skinName = parts[1].strip()
-        item.weaponName = weaponName
-        item.skinName = skinName
-    else:
-        item.weaponName = fullName
-        item.skinName = fullName
+class ItemByMykel:
+    def __init__(self):
+        self.fullName: str = ""
+        self.weaponName: str = ""
+        self.skinName: str = ""
+        self.category: int = -1
+        self.collection: int = -1
+        self.crates: list[int] = []
+        self.minFloat: float = -1.0
+        self.maxFloat: float = -1.0
