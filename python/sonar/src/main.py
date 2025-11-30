@@ -22,7 +22,7 @@ import argparse
 import validator
 import api_bymykel
 import api_steamweb
-import ready_item_processor
+import prepared_item_processor
 import syncer
 import time
 import logger
@@ -47,7 +47,7 @@ def main() -> None:
         if args.steamweb:
             api_steamweb.refreshSteamWebApiItems(envPath)
         if args.process:
-            ready_item_processor.createReadyItems()
+            prepared_item_processor.createPreparedItems()
         if args.sync == "server":
             syncer.updateServer(envPath)
         elif args.sync == "local":
