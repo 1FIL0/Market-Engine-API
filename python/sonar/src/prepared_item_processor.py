@@ -67,16 +67,26 @@ def createMarketMasterItems() -> None:
     
     currentMasterName = ""
     currentMasterCategory = -1
+    currentMasterPushedCategories = []
 
     for steamwebItem in steamWebApiItems:
+        # Skip these skins
+        if steamwebItem.category == definitions.consts.CATEGORY_SOUVENIR: continue
+        
         key = (steamwebItem.weaponName, steamwebItem.skinName)
         if not key in bymykelDict:
             continue
         bymykelItem = bymykelDict[key]
 
-        # MASTER ITEMS 
-        if steamwebItem.fullName != currentMasterName or steamwebItem.category != currentMasterCategory:
+        # MASTER ITEMS - Important for steamwebapi items array to be sorted 
+        if steamwebItem.fullName != currentMasterName:
+            currentMasterName = ""
+            currentMasterCategory = -1
+            currentMasterPushedCategories = []
+        if (steamwebItem.fullName != currentMasterName) or (steamwebItem.category != currentMasterCategory and steamwebItem.category not in currentMasterPushedCategories):
             currentMasterName = bymykelItem.fullName
+            currentMasterCategory = steamwebItem.category
+            currentMasterPushedCategories.append(steamwebItem.category)
             masterItem = MasterItem()
             combineValuesToMasterItem(masterItem, bymykelItem, steamwebItem)
             insertMasterItem(masterItem)
@@ -92,6 +102,7 @@ def createMarketMasterItems() -> None:
     logger.sendMessage("Finished")
 
 def combineValuesToMasterItem(masterItem: MasterItem, bymykelItem: ItemByMykel, steamwebItem: ItemSteamweb):
+    masterItem.permID = steamwebItem.permID
     masterItem.weaponName = bymykelItem.weaponName
     masterItem.skinName = bymykelItem.skinName
     masterItem.fullName = f"{masterItem.weaponName} {masterItem.skinName}"
@@ -137,6 +148,7 @@ def insertMarketItem(marketItem: MarketItem) -> None:
 
 def sortMasterItems() -> None:
     global g_masterItems
+    global g_masterItemsCollectionCategoryGrade
     g_masterItems.sort(key=lambda item: (item.collection, item.grade, item.fullName, item.category))
     currentID = 0
     for masterItem in g_masterItems:
@@ -152,6 +164,9 @@ def sortMarketItems() -> None:
     for marketItem in g_marketItems:
         marketItem.tempAccessID = currentID
         currentID += 1
+        for masterItem in g_masterItems:
+            if masterItem.fullName == marketItem.fullName and masterItem.category == marketItem.category:
+                marketItem.masterItemPermID = masterItem.permID
 
 def pushMasterItemTradeupableStatus(masterItem: MasterItem) -> None:
     tradeupable = False
@@ -174,8 +189,8 @@ def pushMasterItemOutputs(masterItem: MasterItem) -> None:
     global g_masterItemsCollectionCategoryGrade
     if not masterItem.tradeupable: return
     masterCollectionItems = g_masterItemsCollectionCategoryGrade[masterItem.collection][masterItem.category][masterItem.grade + 1]
-    for masterItem in masterCollectionItems:
-        masterItem.possibleOutputs.append(masterItem)
+    for masterCollectionItem in masterCollectionItems:
+        masterItem.possibleOutputs.append(masterCollectionItem)
 
 def saveMasterItems() -> None:
     global g_masterItems
@@ -203,16 +218,19 @@ def masterItemToJson(masterItem: MasterItem) -> None:
     for output in masterItem.possibleOutputs:
         outputItemEntry = {
             "Temp Access ID": output.tempAccessID,
+            "Perm ID": output.permID,
             "Full Name": output.fullName,
         }
         outputsDict.append(outputItemEntry)
 
     jsonData: dict[str, Any] = {
         "Temp Access ID": masterItem.tempAccessID,
+        "Perm ID": masterItem.permID,
         "Weapon Name": masterItem.weaponName,
         "Skin Name": masterItem.skinName,
         "Full Name": masterItem.fullName,
         "Grade": definitions.gradeToString(masterItem.grade),
+        "Category": definitions.categoryToString(masterItem.category),
         "Tradeupable": masterItem.tradeupable,
         "Collection": definitions.collectionToString(masterItem.collection),
         "Crates": cratesStringified,
@@ -229,6 +247,7 @@ def marketItemToJson(marketItem: MarketItem) -> None:
     jsonData: dict[str, Any] = {
         "Temp Access ID": marketItem.tempAccessID,
         "Perm ID": marketItem.permID,
+        "Master Item Perm ID": marketItem.masterItemPermID,
         "Weapon Name": marketItem.weaponName,
         "Skin Name": marketItem.skinName,
         "Full Name": marketItem.fullName,

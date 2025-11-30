@@ -106,6 +106,7 @@ def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> None:
         logger.warnMessage(f"NON STEAM MARKET URL DETECTED: {url}")
 
 def sortSteamWebApiItems() -> None:
+    global gSteamWebApiItems
     gSteamWebApiItems.sort(key=lambda item: (item.fullName))
 
 def refreshSteamWebApiItems(envPath: str) -> requests.Response:
