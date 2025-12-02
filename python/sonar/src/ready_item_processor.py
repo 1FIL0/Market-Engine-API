@@ -123,9 +123,15 @@ def pushReadyItemOutputs(readyItem: MarketItem) -> None:
     global g_readyItemsCollectionCategoryGradeWear
     if not readyItem.tradeupable: return
     collectionItemsWearArray = g_readyItemsCollectionCategoryGradeWear[readyItem.collection][readyItem.category][readyItem.grade + 1]
+    
+    # get only the lowest wear of each output item
+    seenNames = []
     for wear in range(len(collectionItemsWearArray)):
         for collectionItem in collectionItemsWearArray[wear]:
+            if collectionItem.fullName in seenNames: continue
             readyItem.possibleOutputs.append(collectionItem)
+            seenNames.append(collectionItem.fullName)
+            
 
 def insertReadyItem(readyItem: MarketItem) -> None:
     g_readyItems.append(readyItem)
