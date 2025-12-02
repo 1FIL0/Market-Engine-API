@@ -123,9 +123,15 @@ def pushReadyItemOutputs(readyItem: MarketItem) -> None:
     global g_readyItemsCollectionCategoryGradeWear
     if not readyItem.tradeupable: return
     collectionItemsWearArray = g_readyItemsCollectionCategoryGradeWear[readyItem.collection][readyItem.category][readyItem.grade + 1]
+    
+    # get only the lowest wear of each output item
+    seenNames = []
     for wear in range(len(collectionItemsWearArray)):
         for collectionItem in collectionItemsWearArray[wear]:
+            if collectionItem.fullName in seenNames: continue
             readyItem.possibleOutputs.append(collectionItem)
+            seenNames.append(collectionItem.fullName)
+            
 
 def insertReadyItem(readyItem: MarketItem) -> None:
     g_readyItems.append(readyItem)
@@ -168,10 +174,10 @@ def loadReadyItemsFromJson() -> None:
         
         for possibleOutput in entry["Possible Outputs"]:
             item = MarketItem()
-            item.tempAccessID = possibleOutput["Temp Access ID"]
-            item.permID = possibleOutput["Perm ID"]
-            item.fullName = possibleOutput["Full Name"]
-            item.wear = possibleOutput["Wear"]
+            item.tempAccessID = possibleOutput["Output Temp Access ID"]
+            item.permID = possibleOutput["Output Perm ID"]
+            item.fullName = possibleOutput["Output Full Name"]
+            item.wear = possibleOutput["Output Wear"]
             readyItem.possibleOutputs.append(item)
 
         readyItem.imageName = entry["Image Name"]
@@ -187,10 +193,10 @@ def readyItemToJson(readyItem: MarketItem) -> None:
     outputsDict = []
     for output in readyItem.possibleOutputs:
         outputItemEntry = {
-            "Temp Access ID": output.tempAccessID,
-            "Perm ID": output.permID,
-            "Full Name": output.fullName,
-            "Wear": definitions.wearToString(output.wear)
+            "Output Temp Access ID": output.tempAccessID,
+            "Output Perm ID": output.permID,
+            "Output Full Name": output.fullName,
+            "Output Wear": definitions.wearToString(output.wear)
         }
         outputsDict.append(outputItemEntry)
 
