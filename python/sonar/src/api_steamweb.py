@@ -31,12 +31,16 @@ import response
 import json
 import env
 import shared_args
+import re
 
-gSteamWebApiItems: list[ItemSteamweb] = list()
+LOAD_SUCCESS = 0
+LOAD_INVALID_ITEM = -1
+
+g_steamWebApiItems: list[ItemSteamweb] = list()
 
 def loadSteamWebApiItems() -> None:
-    global gSteamWebApiItems
-    gSteamWebApiItems.clear()
+    global g_steamWebApiItems
+    g_steamWebApiItems.clear()
     logger.sendMessage("Loading Steam Web Api Items")
     data = file_handler.loadJson(str(definitions.PATH_DATA_API_STEAM_WEB_API_ITEMS))
     if not data:
@@ -44,20 +48,38 @@ def loadSteamWebApiItems() -> None:
         return
     for entry in data:
         steamWebItem = ItemSteamweb()
-        loadValuesToItem(steamWebItem, entry)
-        gSteamWebApiItems.append(steamWebItem)
+        if loadValuesToItem(steamWebItem, entry) == LOAD_INVALID_ITEM: continue
+        g_steamWebApiItems.append(steamWebItem)
     logger.sendMessage("Done")
 
-def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> None:
-    item.fullName = entry["groupname"]
-    # Remove star symbol on knives/gloves
-    if "\u2605" in item.fullName:
-        item.fullName = item.fullName.replace("\u2605", "").strip()
+def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> int:
+    itemMarketName = entry["marketname"]
+    tagType = entry["tag1"]
+
+    validTypeFound = False
+    for weaponName in definitions.weapons:
+        if weaponName.lower() + " |" in itemMarketName.lower():
+            validTypeFound = True
+            break
+    if not validTypeFound: return LOAD_INVALID_ITEM
+
+
+    item.fullName = itemMarketName
+    item.fullName = re.sub(r"StatTrak", "", item.fullName, flags=re.IGNORECASE)
+    item.fullName = re.sub(r"Souvenir", "", item.fullName, flags=re.IGNORECASE)
+    item.fullName = re.sub(r"\u2605", "", item.fullName)
+    item.fullName = re.sub(r"\u2122", "", item.fullName)
+    item.fullName = re.sub(r"\(.*?\)", "", item.fullName)
+    item.fullName = item.fullName.strip()
+
     item_utils.pushSplitItemName(item.fullName, item)
     item.fullName.replace("  ", " ")
     item.permID = int(entry["id"], 16)
 
     wearStr: str = entry["wear"]
+    if not wearStr:
+        logger.errorMessage(f"{itemMarketName} has no wear")
+
     if wearStr:
         if wearStr == "fn": item.wear = definitions.consts.WEAR_FACTORY_NEW
         elif wearStr == "mw": item.wear = definitions.consts.WEAR_MINIMAL_WEAR
@@ -67,14 +89,18 @@ def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> None:
         elif wearStr == "np": item.wear = definitions.consts.WEAR_NO_WEAR
 
     categoryStr: str = entry["quality"]
+    if not categoryStr:
+        logger.errorMessage(f"{itemMarketName} has no category")
+
     if categoryStr:
         if categoryStr.startswith("Norm"): item.category = definitions.consts.CATEGORY_NORMAL
         elif categoryStr.startswith("Stat"): item.category = definitions.consts.CATEGORY_STAT_TRAK
         elif categoryStr.startswith("Souv"): item.category = definitions.consts.CATEGORY_SOUVENIR
-        else:
-            item.category = definitions.consts.CATEGORY_NORMAL
 
     gradeStr: str = entry["rarity"]
+    if not gradeStr:
+        logger.errorMessage(f"{itemMarketName} has no rarity")
+
     if gradeStr:
         if gradeStr.startswith("Consumer"): item.grade = definitions.consts.GRADE_CONSUMER
         if gradeStr.startswith("Industrial"): item.grade = definitions.consts.GRADE_INDUSTRIAL
@@ -85,8 +111,7 @@ def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> None:
         if gradeStr.startswith("Contraband"): item.grade = definitions.consts.GRADE_CONTRABAND
 
     # KNIFE / GLOVES HAVE CUSTOM SPECIAL RARITY (STAR)
-    tag = entry["tag1"]
-    if tag == "Knife" or tag == "Gloves":
+    if tagType == "Knife" or tagType == "Gloves":
         item.grade = definitions.consts.GRADE_STAR
 
     price: float = 0.0
@@ -104,6 +129,8 @@ def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> None:
     else:
         logger.warnMessage(f"NON STEAM MARKET URL DETECTED: {url}")
 
+    return LOAD_SUCCESS
+
 def refreshSteamWebApiItems(envPath: str) -> requests.Response:
     if not envPath:
         envPath: Path = Path(__file__).resolve().parents[3] / ".env"
@@ -120,5 +147,5 @@ def refreshSteamWebApiItems(envPath: str) -> requests.Response:
     return res
 
 def getItems() -> list[ItemSteamweb]:
-    global gSteamWebApiItems
-    return gSteamWebApiItems
+    global g_steamWebApiItems
+    return g_steamWebApiItems

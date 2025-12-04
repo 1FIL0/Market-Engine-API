@@ -40,10 +40,12 @@ def loadByMykelItems() -> None:
     for dataItem in data:
         byMykelItem = ItemByMykel()
 
-        # Remove star symbol on knives/gloves
+        # Remove star symbol on knives/gloves and other shit on stattrak
         fullName = dataItem["name"]
         if "\u2605" in fullName:
             fullName = fullName.replace("\u2605", "").strip()
+        if "\u2122" in fullName:
+            fullName = fullName.replace("\u2122", "").strip()
 
         item_utils.pushSplitItemName(fullName, byMykelItem)
         byMykelItem.fullName = fullName
