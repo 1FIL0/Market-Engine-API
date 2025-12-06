@@ -57,7 +57,6 @@ def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> int:
     itemMarketNameNoSymbols = itemMarketName
     itemMarketNameNoSymbols = re.sub(r"\u2605", "", itemMarketNameNoSymbols)
     itemMarketNameNoSymbols = re.sub(r"\u2122", "", itemMarketNameNoSymbols)
-    tagType = entry["tag1"]
 
     # Ignore garbage like music kits, stickers, etc
     validTypeFound = False
@@ -106,10 +105,8 @@ def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> int:
         if categoryStr.lower().startswith("norm"): item.category = definitions.consts.CATEGORY_NORMAL
         elif categoryStr.lower().startswith("stat"): item.category = definitions.consts.CATEGORY_STAT_TRAK
         elif categoryStr.lower().startswith("souv"): item.category = definitions.consts.CATEGORY_SOUVENIR
-
-    # KNIFE / GLOVES HAVE CUSTOM SPECIAL RARITY (STAR)
-    if tagType == "Knife" or tagType == "Gloves":
-        item.grade = definitions.consts.GRADE_STAR
+        elif categoryStr == ("\u2122"): item.category = definitions.consts.CATEGORY_STAT_TRAK
+        elif categoryStr == ("\u2605"): item.category = definitions.consts.CATEGORY_NORMAL
 
     price: float = 0.0
     if entry["pricemedian7d"] and not price: price = entry["pricemedian7d"]

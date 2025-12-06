@@ -75,6 +75,9 @@ def loadByMykelItems() -> None:
         if "souvenir" in dataItem and dataItem["souvenir"]:
             byMykelItem.category = definitions.consts.CATEGORY_SOUVENIR
 
+        itemTypeDict = dataItem["category"]
+        itemType = itemTypeDict["name"]
+
         rarityDict = dataItem["rarity"]
         gradeStr = rarityDict["name"]
         if not gradeStr:
@@ -83,7 +86,12 @@ def loadByMykelItems() -> None:
             gradeStr = re.sub(r"Grade", "", gradeStr)
             gradeStr = re.sub(r"-", " ", gradeStr)
             gradeStr = gradeStr.strip()
-            print(gradeStr)
+            if gradeStr == "Mil Spec": gradeStr = definitions.consts.GRADE_MILSPEC_STR
+            if gradeStr == "Extraordinary": gradeStr = definitions.consts.GRADE_STAR_STR
+            byMykelItem.grade = definitions.gradeToInt(gradeStr)
+
+        if itemType == "Knives" or itemType == "Gloves":
+            gradeStr = definitions.consts.GRADE_STAR_STR
             byMykelItem.grade = definitions.gradeToInt(gradeStr)
 
         # Some special skins have null float ranges. such as vanilla knives
