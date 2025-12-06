@@ -54,8 +54,12 @@ def loadSteamWebApiItems() -> None:
 
 def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> int:
     itemMarketName = entry["marketname"]
+    itemMarketNameNoSymbols = itemMarketName
+    itemMarketNameNoSymbols = re.sub(r"\u2605", "", itemMarketNameNoSymbols)
+    itemMarketNameNoSymbols = re.sub(r"\u2122", "", itemMarketNameNoSymbols)
     tagType = entry["tag1"]
 
+    # Ignore garbage like music kits, stickers, etc
     validTypeFound = False
     for weaponName in definitions.weapons:
         if weaponName.lower() + " |" in itemMarketName.lower():
@@ -64,11 +68,9 @@ def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> int:
     if not validTypeFound: return LOAD_INVALID_ITEM
 
 
-    item.fullName = itemMarketName
+    item.fullName = itemMarketNameNoSymbols
     item.fullName = re.sub(r"StatTrak", "", item.fullName, flags=re.IGNORECASE)
     item.fullName = re.sub(r"Souvenir", "", item.fullName, flags=re.IGNORECASE)
-    item.fullName = re.sub(r"\u2605", "", item.fullName)
-    item.fullName = re.sub(r"\u2122", "", item.fullName)
     item.fullName = re.sub(r"\(.*?\)", "", item.fullName)
     item.fullName = item.fullName.strip()
 
@@ -78,9 +80,14 @@ def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> int:
 
     wearStr: str = entry["wear"]
     if not wearStr:
-        logger.errorMessage(f"{itemMarketName} has no wear")
-
-    if wearStr:
+        logger.warnMessage(f"{itemMarketName} has no wear, fetching from name")
+        if "factory-new" in itemMarketNameNoSymbols.lower(): item.wear = definitions.consts.WEAR_FACTORY_NEW
+        if "minimal-wear" in itemMarketNameNoSymbols.lower(): item.wear = definitions.consts.WEAR_MINIMAL_WEAR
+        if "field-tested" in itemMarketNameNoSymbols.lower(): item.wear = definitions.consts.WEAR_FIELD_TESTED
+        if "well-worn" in itemMarketNameNoSymbols.lower(): item.wear = definitions.consts.WEAR_WELL_WORN
+        if "battle-scarred" in itemMarketNameNoSymbols.lower(): item.wear = definitions.consts.WEAR_BATTLE_SCARRED
+        logger.sendMessage(f"Found: {definitions.wearToString(item.wear)}")
+    else:
         if wearStr == "fn": item.wear = definitions.consts.WEAR_FACTORY_NEW
         elif wearStr == "mw": item.wear = definitions.consts.WEAR_MINIMAL_WEAR
         elif wearStr == "ft": item.wear = definitions.consts.WEAR_FIELD_TESTED
@@ -90,25 +97,15 @@ def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> int:
 
     categoryStr: str = entry["quality"]
     if not categoryStr:
-        logger.errorMessage(f"{itemMarketName} has no category")
-
-    if categoryStr:
-        if categoryStr.startswith("Norm"): item.category = definitions.consts.CATEGORY_NORMAL
-        elif categoryStr.startswith("Stat"): item.category = definitions.consts.CATEGORY_STAT_TRAK
-        elif categoryStr.startswith("Souv"): item.category = definitions.consts.CATEGORY_SOUVENIR
-
-    gradeStr: str = entry["rarity"]
-    if not gradeStr:
-        logger.errorMessage(f"{itemMarketName} has no rarity")
-
-    if gradeStr:
-        if gradeStr.startswith("Consumer"): item.grade = definitions.consts.GRADE_CONSUMER
-        if gradeStr.startswith("Industrial"): item.grade = definitions.consts.GRADE_INDUSTRIAL
-        if gradeStr.startswith("Mil"): item.grade = definitions.consts.GRADE_MILSPEC
-        if gradeStr.startswith("Restricted"): item.grade = definitions.consts.GRADE_RESTRICTED
-        if gradeStr.startswith("Classified"): item.grade = definitions.consts.GRADE_CLASSIFIED
-        if gradeStr.startswith("Covert"): item.grade = definitions.consts.GRADE_COVERT
-        if gradeStr.startswith("Contraband"): item.grade = definitions.consts.GRADE_CONTRABAND
+        logger.warnMessage(f"{itemMarketName} has no category, fetching from name")
+        if "stattrak" in itemMarketNameNoSymbols.lower(): item.category = definitions.consts.CATEGORY_STAT_TRAK
+        elif "souvenir" in itemMarketNameNoSymbols.lower(): item.category = definitions.consts.CATEGORY_SOUVENIR
+        else: item.category = definitions.consts.CATEGORY_NORMAL
+        logger.sendMessage(f"Found: {definitions.categoryToString(item.category)}")
+    else:
+        if categoryStr.lower().startswith("norm"): item.category = definitions.consts.CATEGORY_NORMAL
+        elif categoryStr.lower().startswith("stat"): item.category = definitions.consts.CATEGORY_STAT_TRAK
+        elif categoryStr.lower().startswith("souv"): item.category = definitions.consts.CATEGORY_SOUVENIR
 
     # KNIFE / GLOVES HAVE CUSTOM SPECIAL RARITY (STAR)
     if tagType == "Knife" or tagType == "Gloves":

@@ -22,7 +22,6 @@ class ItemSteamweb:
         self.weaponName: str = ""
         self.skinName: str = ""
         self.category: int = -1
-        self.grade: int = -1
         self.wear: int = -1
         self.marketPrice: float = -1.0
         self.imageUrl: str = ""

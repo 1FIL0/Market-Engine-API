@@ -85,7 +85,7 @@ def combineValuesToReadyItem(readyItem: MarketItem, bymykelItem: ItemByMykel, st
     readyItem.collection = bymykelItem.collection
     readyItem.crates = bymykelItem.crates
     readyItem.category = steamwebItem.category
-    readyItem.grade = steamwebItem.grade
+    readyItem.grade = bymykelItem.grade
     readyItem.wear = steamwebItem.wear
     readyItem.marketPrice = steamwebItem.marketPrice
     readyItem.imageUrl = steamwebItem.imageUrl

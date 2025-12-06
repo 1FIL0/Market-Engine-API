@@ -21,6 +21,7 @@ class ItemByMykel:
         self.weaponName: str = ""
         self.skinName: str = ""
         self.category: int = -1
+        self.grade: int = -1
         self.collection: int = -1
         self.crates: list[int] = []
         self.minFloat: float = -1.0

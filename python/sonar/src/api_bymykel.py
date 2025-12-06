@@ -26,6 +26,7 @@ from item_bymykel import ItemByMykel
 import item_utils
 import json
 import response
+import re
 
 gByMykelApiItems: list[ItemByMykel] = list()
 
@@ -41,7 +42,8 @@ def loadByMykelItems() -> None:
         byMykelItem = ItemByMykel()
 
         # Remove star symbol on knives/gloves and other shit on stattrak
-        fullName = dataItem["name"]
+        marketName = dataItem["name"]
+        fullName = marketName
         if "\u2605" in fullName:
             fullName = fullName.replace("\u2605", "").strip()
         if "\u2122" in fullName:
@@ -72,6 +74,17 @@ def loadByMykelItems() -> None:
             byMykelItem.category = definitions.consts.CATEGORY_STAT_TRAK
         if "souvenir" in dataItem and dataItem["souvenir"]:
             byMykelItem.category = definitions.consts.CATEGORY_SOUVENIR
+
+        rarityDict = dataItem["rarity"]
+        gradeStr = rarityDict["name"]
+        if not gradeStr:
+            logger.errorMessage(f"Item has no grade {marketName}")
+        else:
+            gradeStr = re.sub(r"Grade", "", gradeStr)
+            gradeStr = re.sub(r"-", " ", gradeStr)
+            gradeStr = gradeStr.strip()
+            print(gradeStr)
+            byMykelItem.grade = definitions.gradeToInt(gradeStr)
 
         # Some special skins have null float ranges. such as vanilla knives
         byMykelItem.minFloat = dataItem["min_float"]
