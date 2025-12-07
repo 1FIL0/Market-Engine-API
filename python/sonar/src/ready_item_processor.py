@@ -112,6 +112,7 @@ def sortAddPlaceholders() -> None:
     currentItemCat = g_readyItems[0].category
     seenWears = []
     wearItems = []
+    placeholderItems = []
 
     for idx, readyItem in enumerate(g_readyItems):
         if currentItemName != readyItem.fullName or currentItemCat != readyItem.category or idx == len(g_readyItems) - 1:
@@ -122,8 +123,9 @@ def sortAddPlaceholders() -> None:
                 if not i in seenWears:
                     logger.sendMessage(f"{wearItems[0].fullName} ({definitions.categoryToString(currentItemCat)}) ({definitions.wearToString(i)}) is not found, creating placeholder")
                     placeholderItem = copy.deepcopy(wearItems[0])
+                    placeholderItem.category = currentItemCat
                     placeholderItem.wear = i
-                    insertReadyItem(placeholderItem)
+                    placeholderItems.append(placeholderItem)
             
             currentItemName = readyItem.fullName
             currentItemCat = readyItem.category
@@ -134,6 +136,8 @@ def sortAddPlaceholders() -> None:
         seenWears.append(readyItem.wear)
 
     # sort again
+    for placeholderItem in placeholderItems:
+        insertReadyItem(placeholderItem)
     g_readyItems.sort(key=lambda item: (item.collection, item.grade, item.fullName, item.category, item.wear))
 
 
