@@ -28,6 +28,7 @@ from item_steamweb import ItemSteamweb
 import api_bymykel
 import api_steamweb
 from collections import defaultdict
+import copy
 
 g_readyItems: list[MarketItem] = list()
 g_readyItemsCollectionCategoryGradeWear: list[list[list[list[list[MarketItem]]]]] = list()
@@ -95,12 +96,46 @@ def combineValuesToReadyItem(readyItem: MarketItem, bymykelItem: ItemByMykel, st
 def sortReadyItems() -> None:
     global g_readyItems
     g_readyItems.sort(key=lambda item: (item.collection, item.grade, item.fullName, item.category, item.wear))
+    sortAddPlaceholders()
+
     currentID = 0
     for readyItem in g_readyItems:
         readyItem.tempAccessID = currentID
         currentID += 1
         pushReadyItemTradeupableStatus(readyItem)
         pushReadyItemOutputs(readyItem)
+
+# some steamwebapi items dont have entries, create placeholders
+def sortAddPlaceholders() -> None:
+    global g_readyItems
+    currentItemName = g_readyItems[0].fullName
+    currentItemCat = g_readyItems[0].category
+    seenWears = []
+    wearItems = []
+
+    for idx, readyItem in enumerate(g_readyItems):
+        if currentItemName != readyItem.fullName or currentItemCat != readyItem.category or idx == len(g_readyItems) - 1:
+            minItemWear = definitions.itemFloatValToInt(readyItem.minFloat)
+            maxItemWear = definitions.itemFloatValToInt(readyItem.maxFloat)
+
+            for i in range(minItemWear, maxItemWear):
+                if not i in seenWears:
+                    logger.sendMessage(f"{wearItems[0].fullName} ({definitions.categoryToString(currentItemCat)}) ({definitions.wearToString(i)}) is not found, creating placeholder")
+                    placeholderItem = copy.deepcopy(wearItems[0])
+                    placeholderItem.wear = i
+                    insertReadyItem(placeholderItem)
+            
+            currentItemName = readyItem.fullName
+            currentItemCat = readyItem.category
+            wearItems.clear()
+            seenWears.clear()
+
+        wearItems.append(readyItem)
+        seenWears.append(readyItem.wear)
+
+    # sort again
+    g_readyItems.sort(key=lambda item: (item.collection, item.grade, item.fullName, item.category, item.wear))
+
 
 def pushReadyItemTradeupableStatus(readyItem: MarketItem) -> None:
     tradeupable = False
