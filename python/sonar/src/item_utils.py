@@ -26,6 +26,8 @@ def pushSplitItemName(fullName: str, item: MarketItem) -> None:
         skinName = parts[1].strip()
         item.weaponName = weaponName
         item.skinName = skinName
+        item.fullName = weaponName + " " + skinName
     else:
         item.weaponName = fullName
         item.skinName = fullName
+        item.fullName = item.weaponName + " " + item.skinName

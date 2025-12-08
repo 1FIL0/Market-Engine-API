@@ -80,7 +80,7 @@ def combineValuesToReadyItem(readyItem: MarketItem, bymykelItem: ItemByMykel, st
     readyItem.permID = steamwebItem.permID
     readyItem.weaponName = bymykelItem.weaponName
     readyItem.skinName = bymykelItem.skinName
-    readyItem.fullName = f"{readyItem.weaponName} {readyItem.skinName}"
+    readyItem.fullName = bymykelItem.fullName
     readyItem.minFloat = bymykelItem.minFloat
     readyItem.maxFloat = bymykelItem.maxFloat
     readyItem.collection = bymykelItem.collection
@@ -115,7 +115,7 @@ def sortAddPlaceholders() -> None:
     placeholderItems = []
 
     for idx, readyItem in enumerate(g_readyItems):
-        if currentItemName != readyItem.fullName or currentItemCat != readyItem.category or idx == len(g_readyItems) - 1:
+        if (currentItemName != readyItem.fullName or currentItemCat != readyItem.category or idx == len(g_readyItems) - 1) and (wearItem.wear != definitions.consts.WEAR_NO_WEAR):
             minItemWear = definitions.itemFloatValToInt(wearItem.minFloat)
             maxItemWear = definitions.itemFloatValToInt(wearItem.maxFloat)
 

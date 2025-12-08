@@ -57,13 +57,15 @@ def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> int:
     itemMarketNameNoSymbols = itemMarketName
     itemMarketNameNoSymbols = re.sub(r"\u2605", "", itemMarketNameNoSymbols)
     itemMarketNameNoSymbols = re.sub(r"\u2122", "", itemMarketNameNoSymbols)
+    itemMarketNameNoSymbols = itemMarketNameNoSymbols.strip()
 
     # Ignore garbage like music kits, stickers, etc
     validTypeFound = False
     for weaponName in definitions.weapons:
-        if weaponName.lower() + " |" in itemMarketName.lower():
+        if (weaponName.lower() + " |" in itemMarketName.lower()) or (itemMarketNameNoSymbols == weaponName):
             validTypeFound = True
             break
+
     if not validTypeFound: return LOAD_INVALID_ITEM
 
     item.fullName = itemMarketNameNoSymbols

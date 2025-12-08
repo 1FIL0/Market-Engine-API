@@ -50,7 +50,6 @@ def loadByMykelItems() -> None:
             fullName = fullName.replace("\u2122", "").strip()
 
         item_utils.pushSplitItemName(fullName, byMykelItem)
-        byMykelItem.fullName = fullName
 
         # Sometimes skins have it's weapon name only, like vanilla knives
         if (byMykelItem.weaponName == byMykelItem.skinName):
