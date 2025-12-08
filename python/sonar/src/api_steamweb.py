@@ -66,8 +66,6 @@ def loadValuesToItem(item: ItemSteamweb, entry: dict[Any, Any]) -> int:
             break
     if not validTypeFound: return LOAD_INVALID_ITEM
 
-
-
     item.fullName = itemMarketNameNoSymbols
     item.fullName = re.sub(r"StatTrak", "", item.fullName, flags=re.IGNORECASE)
     item.fullName = re.sub(r"Souvenir", "", item.fullName, flags=re.IGNORECASE)
