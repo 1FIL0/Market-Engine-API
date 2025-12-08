@@ -111,28 +111,30 @@ def sortAddPlaceholders() -> None:
     currentItemName = g_readyItems[0].fullName
     currentItemCat = g_readyItems[0].category
     seenWears = []
-    wearItems = []
+    wearItem = None
     placeholderItems = []
 
     for idx, readyItem in enumerate(g_readyItems):
         if currentItemName != readyItem.fullName or currentItemCat != readyItem.category or idx == len(g_readyItems) - 1:
-            minItemWear = definitions.itemFloatValToInt(readyItem.minFloat)
-            maxItemWear = definitions.itemFloatValToInt(readyItem.maxFloat)
+            minItemWear = definitions.itemFloatValToInt(wearItem.minFloat)
+            maxItemWear = definitions.itemFloatValToInt(wearItem.maxFloat)
+
+            # dbg
+            # logger.sendMessage(f"{wearItem.fullName} - MINWEAR {minItemWear} - MAXWEAR {maxItemWear} - MINFLOAT {wearItem.minFloat} - MAXFLOAT {wearItem.maxFloat}")
 
             for i in range(minItemWear, maxItemWear):
                 if not i in seenWears:
-                    logger.sendMessage(f"{wearItems[0].fullName} ({definitions.categoryToString(currentItemCat)}) ({definitions.wearToString(i)}) is not found, creating placeholder")
-                    placeholderItem = copy.deepcopy(wearItems[0])
+                    logger.sendMessage(f"{wearItem.fullName} ({definitions.categoryToString(currentItemCat)}) ({definitions.wearToString(i)}) is not found, creating placeholder")
+                    placeholderItem = copy.deepcopy(wearItem)
                     placeholderItem.category = currentItemCat
                     placeholderItem.wear = i
                     placeholderItems.append(placeholderItem)
             
             currentItemName = readyItem.fullName
             currentItemCat = readyItem.category
-            wearItems.clear()
             seenWears.clear()
 
-        wearItems.append(readyItem)
+        wearItem = readyItem
         seenWears.append(readyItem.wear)
 
     # sort again
